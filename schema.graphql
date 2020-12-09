@@ -1,6 +1,31 @@
-type ExampleEntity @entity {
+type _Approval @entity {
   id: ID!
   count: BigInt!
-  owner: Bytes! # address
-  spender: Bytes! # address
+  _owner: Bytes! # address
+  _spender: Bytes! # address
+  _value: BigInt!
+}
+
+type _DelegateChanged @entity {
+  id: ID!
+  count: BigInt!
+  _delegator: Bytes! # address
+  _fromDelegate: Bytes! # address
+  _toDelegate: Bytes! # address
+}
+
+type _DelegateVotesChanged @entity {
+  id: ID!
+  count: BigInt!
+  _delegate: Bytes! # address
+  _previousBalance: BigInt!
+  _newBalance: BigInt!
+}
+
+type _Transfer @entity {
+  id: ID!
+  count: BigInt!
+  _from: Bytes! # address
+  _to: Bytes! # address
+  _value: BigInt!
 }

@@ -4,76 +4,68 @@ import {
   Approval,
   DelegateChanged,
   DelegateVotesChanged,
-  OwnershipTransferred,
   Transfer
 } from "../generated/Dark_Token/Dark_Token"
-import { ExampleEntity } from "../generated/schema"
+import {
+    _Approval, _DelegateChanged, _DelegateVotesChanged, _Transfer
+} from "../generated/schema"
 
 export function handleApproval(event: Approval): void {
-  // Entities can be loaded from the store using a string ID; this ID
-  // needs to be unique across all entities of the same type
-  let entity = ExampleEntity.load(event.transaction.from.toHex())
+    let entity = _Approval.load(event.params.value.toHex())
 
-  // Entities only exist after they have been saved to the store;
-  // `null` checks allow to create entities on demand
-  if (entity == null) {
-    entity = new ExampleEntity(event.transaction.from.toHex())
+    if (entity == null) {
+        entity = new _Approval(event.params.value.toHex())
+        entity.count = BigInt.fromI32(0)
+    }
 
-    // Entity fields can be set using simple assignments
-    entity.count = BigInt.fromI32(0)
-  }
-
-  // BigInt and BigDecimal math are supported
-  entity.count = entity.count + BigInt.fromI32(1)
-
-  // Entity fields can be set based on event parameters
-  entity.owner = event.params.owner
-  entity.spender = event.params.spender
-
-  // Entities can be written to the store with `.save()`
-  entity.save()
-
-  // Note: If a handler doesn't require existing field values, it is faster
-  // _not_ to load the entity from the store. Instead, create it fresh with
-  // `new Entity(...)`, set the fields that should be updated and save the
-  // entity back to the store. Fields that were not set or unset remain
-  // unchanged, allowing for partial updates to be applied.
-
-  // It is also possible to access smart contracts from mappings. For
-  // example, the contract that has emitted the event can be connected to
-  // with:
-  //
-  // let contract = Contract.bind(event.address)
-  //
-  // The following functions can then be called on this contract to access
-  // state variables and other data:
-  //
-  // - contract.DELEGATION_TYPEHASH(...)
-  // - contract.DOMAIN_TYPEHASH(...)
-  // - contract.allowance(...)
-  // - contract.approve(...)
-  // - contract.balanceOf(...)
-  // - contract.checkpoints(...)
-  // - contract.decimals(...)
-  // - contract.decreaseAllowance(...)
-  // - contract.delegates(...)
-  // - contract.getCurrentVotes(...)
-  // - contract.getPriorVotes(...)
-  // - contract.increaseAllowance(...)
-  // - contract.name(...)
-  // - contract.nonces(...)
-  // - contract.numCheckpoints(...)
-  // - contract.owner(...)
-  // - contract.symbol(...)
-  // - contract.totalSupply(...)
-  // - contract.transfer(...)
-  // - contract.transferFrom(...)
+    entity.count = entity.count + BigInt.fromI32(1)
+    entity._owner = event.params.owner
+    entity._spender = event.params.spender
+    entity._value = event.params.value
+    entity.save()
 }
 
-export function handleDelegateChanged(event: DelegateChanged): void {}
+export function handleDelegateChanged(event: DelegateChanged): void {
+    let entity = _DelegateChanged.load(event.params.delegator.toHex())
 
-export function handleDelegateVotesChanged(event: DelegateVotesChanged): void {}
+    if (entity == null) {
+        entity = new _DelegateChanged(event.params.delegator.toHex())
+        entity.count = BigInt.fromI32(0)
+    }
 
-export function handleOwnershipTransferred(event: OwnershipTransferred): void {}
+    entity.count = entity.count + BigInt.fromI32(1)
+    entity._delegator = event.params.delegator
+    entity._fromDelegate = event.params.fromDelegate
+    entity._toDelegate = event.params.toDelegate
+    entity.save()
+}
 
-export function handleTransfer(event: Transfer): void {}
+export function handleDelegateVotesChanged(event: DelegateVotesChanged): void {
+    let entity = _DelegateVotesChanged.load(event.params.delegate.toHex())
+
+    if (entity == null) {
+        entity = new _DelegateVotesChanged(event.params.delegate.toHex())
+        entity.count = BigInt.fromI32(0)
+    }
+
+    entity.count = entity.count + BigInt.fromI32(1)
+    entity._delegate = event.params.delegate
+    entity._previousBalance = event.params.previousBalance
+    entity._newBalance = event.params.newBalance
+    entity.save()
+}
+
+export function handleTransfer(event: Transfer): void {
+    let entity = _Transfer.load(event.params.value.toHex())
+
+    if (entity == null) {
+        entity = new _Transfer(event.params.value.toHex())
+        entity.count = BigInt.fromI32(0)
+    }
+
+    entity.count = entity.count + BigInt.fromI32(1)
+    entity._from = event.params.from
+    entity._to = event.params.to
+    entity._value = event.params.value
+    entity.save()
+}
